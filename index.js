@@ -1,8 +1,11 @@
-require("dotenv").config();
 const TelegramBot = require("node-telegram-bot-api");
+const express = require("express");
 
-// Lấy token từ biến môi trường
-const token = process.env.BOT_TOKEN;
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Chạy Telegram Bot
+const token = process.env.BOT_TOKEN || "your_telegram_bot_token";
 const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/start/, (msg) => {
@@ -10,6 +13,15 @@ bot.onText(/\/start/, (msg) => {
 });
 
 bot.on("message", (msg) => {
-  const chatId = msg.chat.id;
-  bot.sendMessage(chatId, `Bạn vừa nói: ${msg.text}`);
+  bot.sendMessage(msg.chat.id, `Bạn vừa nói: ${msg.text}`);
+});
+
+// Tạo route kiểm tra trạng thái bot (bắt buộc với Render)
+app.get("/", (req, res) => {
+  res.send("Bot is running!");
+});
+
+// Lắng nghe cổng để tránh lỗi Render
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
